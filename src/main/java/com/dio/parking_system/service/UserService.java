@@ -1,6 +1,9 @@
 package com.dio.parking_system.service;
 
+import com.dio.parking_system.domain.Car;
+import com.dio.parking_system.domain.ParkingHistory;
 import com.dio.parking_system.domain.User;
+import com.dio.parking_system.domain.dto.UserDTO;
 import com.dio.parking_system.repository.CarRepo;
 import com.dio.parking_system.repository.ParkingRepo;
 import com.dio.parking_system.repository.UserRepo;
@@ -8,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import static java.time.LocalDateTime.parse;
 
 @Service
 public class UserService {
@@ -24,64 +30,71 @@ public class UserService {
     private ParkingRepo parkingHistoryRepository;
 
     @Transactional
-    public User createUser(User user) {
-        // Set relationships here if needed
-        user.getCars().forEach(car -> {
+    public User createUser(UserDTO userDTO) {
+        User user = new User();
+        user.setName(userDTO.getName());
+        user.setPhone(userDTO.getPhone());
+        user.setEmail(userDTO.getEmail());
+
+        userDTO.getCars().forEach(carDTO -> {
+            Car car = new Car();
+            car.setManufacturer(carDTO.getManufacturer());
+            car.setModel(carDTO.getModel());
+            car.setColor(carDTO.getColor());
+            car.setYear(carDTO.getYear());
+            car.setPlate(carDTO.getPlate());
+            car.setType(carDTO.getType());
             car.setUser(user);
-            car.getHistory().forEach(history -> history.setCar(car));
+
+            carDTO.getHistory().forEach(historyDTO -> {
+                ParkingHistory history = new ParkingHistory();
+                history.setCheckin(LocalDateTime.parse(historyDTO.getCheckin()));
+                history.setCheckout(LocalDateTime.parse(historyDTO.getCheckout()));
+                history.setCar(car);
+                car.getHistory().add(history);
+            });
+
+            user.getCars().add(car);
         });
+
         return userRepository.save(user);
     }
 
-    /**
-     * Retrieves a user by their ID.
-     *
-     * @param id The ID of the user to retrieve.
-     * @return An Optional containing the user if found, otherwise empty.
-     */
+    @Transactional(readOnly = true)
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
-    /**
-     * Retrieves all users from the database.
-     *
-     * @return A list of all user entities.
-     */
+    @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    /**
-     * Updates an existing user.
-     *
-     * @param id   The ID of the user to update.
-     * @param user The updated user entity.
-     * @return An Optional containing the updated user if successful, otherwise empty.
-     */
     @Transactional
-    public Optional<User> updateUser(Long id, User user) {
+    public Optional<User> updateUser(Long id, UserDTO userDTO) {
         if (userRepository.existsById(id)) {
-            user.setId(id); // Ensure that the ID is set for the update operation.
+            User user = new User();
+            user.setId(id);
+            user.setName(userDTO.getName());
+            user.setPhone(userDTO.getPhone());
+            user.setEmail(userDTO.getEmail());
+
+            // Handle cars and parking history
+            // Clear existing cars and parking histories and set new ones from userDTO
+
             return Optional.of(userRepository.save(user));
         } else {
-            return Optional.empty(); // User not found.
+            return Optional.empty();
         }
     }
 
-    /**
-     * Deletes a user by their ID.
-     *
-     * @param id The ID of the user to delete.
-     * @return True if the user was deleted, otherwise false.
-     */
     @Transactional
     public boolean deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
-            return true; // Successfully deleted.
+            return true;
         } else {
-            return false; // User not found.
+            return false;
         }
     }
 }

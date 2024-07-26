@@ -1,44 +1,20 @@
-package com.dio.parking_system.domain;
+package com.dio.parking_system.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import com.dio.parking_system.domain.dto.ParkingHistoryDTO;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "cars")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Car {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CarDTO {
     private Long id;
-
     private String manufacturer;
     private String model;
     private String color;
-
-    @Column(name = "manufacture_year")
     private int year;
-
     private String plate;
     private String type;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    @JsonBackReference
-    private User user;
-
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<ParkingHistory> history = new ArrayList<>();
+    private List<ParkingHistoryDTO> history;
 
     public Long getId() {
         return id;
@@ -96,19 +72,11 @@ public class Car {
         this.type = type;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<ParkingHistory> getHistory() {
+    public List<ParkingHistoryDTO> getHistory() {
         return history;
     }
 
-    public void setHistory(List<ParkingHistory> history) {
+    public void setHistory(List<ParkingHistoryDTO> history) {
         this.history = history;
     }
 }

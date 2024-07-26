@@ -1,9 +1,11 @@
 package com.dio.parking_system.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,11 +20,11 @@ public class ParkingHistory {
     private Long id;
 
     private LocalDateTime checkin;
-
     private LocalDateTime checkout;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "car_id")
+    @JsonBackReference
     private Car car;
 
     public Long getId() {
