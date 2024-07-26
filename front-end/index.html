@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User</title>
+    <style>
+        /* Snackbar container */
+        .snackbar {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            z-index: 1;
+            font-size: 17px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .snackbar.show {
+            visibility: visible;
+            -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @-webkit-keyframes fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @-webkit-keyframes fadeout {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes fadeout {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
+    <script>
+        function addCar() {
+            const carContainer = document.getElementById('cars');
+            const carDiv = document.createElement('div');
+            carDiv.classList.add('car');
+            carDiv.innerHTML = `
+                <h3>Car</h3>
+                <label>Manufacturer: <input type="text" name="carManufacturer"></label><br>
+                <label>Model: <input type="text" name="carModel"></label><br>
+                <label>Color: <input type="text" name="carColor"></label><br>
+                <label>Year: <input type="number" name="carYear"></label><br>
+                <label>Plate: <input type="text" name="carPlate"></label><br>
+                <label>Type: <input type="text" name="carType"></label><br>
+                <div class="history">
+                    <h4>History</h4>
+                    <button type="button" onclick="addHistory(this)">Add History</button>
+                </div>
+            `;
+            carContainer.appendChild(carDiv);
+        }
+
+        function addHistory(button) {
+            const historyContainer = button.parentElement;
+            const historyDiv = document.createElement('div');
+            historyDiv.classList.add('history-entry');
+            historyDiv.innerHTML = `
+                <label>Check-in: <input type="datetime-local" name="historyCheckin"></label><br>
+                <label>Check-out: <input type="datetime-local" name="historyCheckout"></label><br>
+            `;
+            historyContainer.appendChild(historyDiv);
+        }
+
+        function submitForm(event) {
+            event.preventDefault();
+
+            const formData = new FormData(document.getElementById('userForm'));
+            const user = {
+                name: formData.get('name'),
+                phone: formData.get('phone'),
+                email: formData.get('email'),
+                cars: []
+            };
+
+            const cars = document.querySelectorAll('.car');
+            cars.forEach(car => {
+                const carData = {
+                    manufacturer: car.querySelector('[name="carManufacturer"]').value,
+                    model: car.querySelector('[name="carModel"]').value,
+                    color: car.querySelector('[name="carColor"]').value,
+                    year: parseInt(car.querySelector('[name="carYear"]').value),
+                    plate: car.querySelector('[name="carPlate"]').value,
+                    type: car.querySelector('[name="carType"]').value,
+                    history: []
+                };
+
+                const histories = car.querySelectorAll('.history-entry');
+                histories.forEach(history => {
+                    const historyData = {
+                        checkin: history.querySelector('[name="historyCheckin"]').value,
+                        checkout: history.querySelector('[name="historyCheckout"]').value
+                    };
+                    carData.history.push(historyData);
+                });
+
+                user.cars.push(carData);
+            });
+
+            fetch('http://localhost:8080/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showSnackbar('User created successfully!');
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function showSnackbar(message) {
+            const snackbar = document.getElementById('snackbar');
+            snackbar.textContent = message;
+            snackbar.className = 'snackbar show';
+            setTimeout(() => {
+                snackbar.className = snackbar.className.replace('show', '');
+            }, 3000); // Hide after 3 seconds
+        }
+    </script>
+</head>
+<body>
+    <h1>Create User</h1>
+    <form id="userForm" onsubmit="submitForm(event)">
+        <label>Name: <input type="text" name="name" required></label><br>
+        <label>Phone: <input type="text" name="phone" required></label><br>
+        <label>Email: <input type="email" name="email" required></label><br>
+        <div id="cars">
+            <h2>Cars</h2>
+        </div>
+        <button type="button" onclick="addCar()">Add Car</button><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <!-- Snackbar -->
+    <div id="snackbar"></div>
+</body>
+</html>
