@@ -1,8 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
-    username: ${PGUSER}
-    password: ${PGPASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: update
