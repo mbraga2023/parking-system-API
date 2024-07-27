@@ -48,12 +48,12 @@
 			<version>2.5.0</version>
 		</dependency>
 
-		<!-- H2 Database (adicionado via Spring Initializr) -->
+		<!-- H2 Database (adicionado via Spring Initializr)
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

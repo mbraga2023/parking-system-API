@@ -12,9 +12,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "cars")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Car {
 
     @Id
@@ -39,6 +36,9 @@ public class Car {
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<ParkingHistory> history = new ArrayList<>();
+
+    public Car() {
+    }
 
     public Long getId() {
         return id;

@@ -10,9 +10,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "parking_histories")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class ParkingHistory {
 
     @Id
@@ -26,6 +23,9 @@ public class ParkingHistory {
     @JoinColumn(name = "car_id")
     @JsonBackReference
     private Car car;
+
+    public ParkingHistory() {
+    }
 
     public Long getId() {
         return id;
