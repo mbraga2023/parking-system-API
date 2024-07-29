@@ -28,3 +28,5 @@ classDiagram
 
     User "1" -- "0..*" Car : owns
     Car "1" -- "0..*" ParkingHistory : has
+
+
